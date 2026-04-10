@@ -48,6 +48,7 @@ class Game:
         )
         self.final_score = 0    # Pontuação capturada no momento do game over
         self.go_fade = 0.0      # Temporizador de fade-in da tela de game over
+        
 
     def run(self):
         # Process events, update the active scene, and render each frame.
