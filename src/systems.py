@@ -14,7 +14,17 @@ from utils import Vec, rand_edge_pos, rand_unit_vec
 
 class World:
     # Initialize the world state, entity groups, timers, and player progress.
-    def __init__(self):
+    def __init__(
+        self,
+        sfx_ship=None,
+        sfx_ufo=None,
+        sfx_stone_big=None,
+        sfx_stone_small=None,
+    ):
+        self._sfx_ship = sfx_ship
+        self._sfx_ufo = sfx_ufo
+        self._sfx_stone_big = sfx_stone_big
+        self._sfx_stone_small = sfx_stone_small
         self.ship = Ship(Vec(C.WIDTH / 2, C.HEIGHT / 2))
         self.bullets = pg.sprite.Group()
         self.ufo_bullets = pg.sprite.Group()
@@ -67,6 +77,8 @@ class World:
             if bullet:
                 self.ufo_bullets.add(bullet)
                 self.all_sprites.add(bullet)
+                if self._sfx_ufo is not None:
+                    self._sfx_ufo.play()
 
     def try_fire(self):
         # Fire a player bullet when the bullet cap allows it.
@@ -76,6 +88,8 @@ class World:
         if b:
             self.bullets.add(b)
             self.all_sprites.add(b)
+            if self._sfx_ship is not None:
+                self._sfx_ship.play()
 
     def hyperspace(self):
         # Trigger the ship hyperspace action and apply its score penalty.
@@ -153,6 +167,12 @@ class World:
 
     def split_asteroid(self, ast: Asteroid):
         # Destroy an asteroid, award score, and spawn its smaller fragments.
+        if ast.size in ("L", "M"):
+            if self._sfx_stone_big is not None:
+                self._sfx_stone_big.play()
+        else:
+            if self._sfx_stone_small is not None:
+                self._sfx_stone_small.play()
         self.score += C.AST_SIZES[ast.size]["score"]
         split = C.AST_SIZES[ast.size]["split"]
         pos = Vec(ast.pos)

@@ -22,6 +22,15 @@ class Game:
     # Initialize pygame, shared UI resources, and the initial scene state.
     def __init__(self):
         pg.init()
+        pg.mixer.init()
+        self._sfx_ship = self._load_sound(C.SFX_SHIP_BLASTER)
+        self._sfx_ufo = self._load_sound(C.SFX_UFO_BLASTER)
+        self._sfx_stone_big = self._load_sound(C.SFX_BIG_STONE_BREAK)
+        self._sfx_stone_small = self._load_sound(C.SFX_SMALL_STONE_BREAK)
+        self._sfx_defeat = self._load_sound(C.SFX_DEFEAT)
+        self._intro_path_ok = C.INTRO_MUSIC.is_file()
+        self._theme_path_ok = C.THEME_MUSIC.is_file()
+        self._bgm_mode = "none"  # "none" | "intro" | "theme"
         if C.RANDOM_SEED is not None:
             random.seed(C.RANDOM_SEED)
         self.logical = pg.Surface((C.WIDTH, C.HEIGHT))
@@ -31,7 +40,12 @@ class Game:
         self.font = pg.font.SysFont("consolas", 20)
         self.big = pg.font.SysFont("consolas", 48)
         self.scene = Scene("menu")
-        self.world = World()
+        self.world = World(
+            self._sfx_ship,
+            self._sfx_ufo,
+            self._sfx_stone_big,
+            self._sfx_stone_small,
+        )
         self.final_score = 0    # Pontuação capturada no momento do game over
         self.go_fade = 0.0      # Temporizador de fade-in da tela de game over
 
@@ -57,18 +71,31 @@ class Game:
                         if e.key == pg.K_LSHIFT:
                             self.world.hyperspace()
                     elif self.scene.name == "menu":
-                        self.world = World()
+                        self.world = World(
+                            self._sfx_ship,
+                            self._sfx_ufo,
+                            self._sfx_stone_big,
+                            self._sfx_stone_small,
+                        )
                         self.scene = Scene("play")
+                        self._start_theme_music()
                     elif self.scene.name == "game_over":
                         if e.key in (pg.K_RETURN, pg.K_SPACE):
-                            self.world = World()
+                            self.world = World(
+                                self._sfx_ship,
+                                self._sfx_ufo,
+                                self._sfx_stone_big,
+                                self._sfx_stone_small,
+                            )
                             self.go_fade = 0.0
                             self.scene = Scene("play")
+                            self._start_theme_music()
 
             keys = pg.key.get_pressed()
             self.logical.fill(C.BLACK)
 
             if self.scene.name == "menu":
+                self._start_intro_music()
                 self.draw_menu()
             elif self.scene.name == "play":
                 self.world.update(dt, keys)
@@ -77,6 +104,9 @@ class Game:
                 if self.world.game_over:
                     self.final_score = self.world.score
                     self.go_fade = 0.0
+                    self._stop_bgm()
+                    if self._sfx_defeat is not None:
+                        self._sfx_defeat.play()
                     self.scene = Scene("game_over")
             elif self.scene.name == "game_over":
                 self.go_fade += dt
@@ -84,6 +114,50 @@ class Game:
 
             self._present()
             pg.display.flip()
+
+    @staticmethod
+    def _load_sound(path):
+        if not path.is_file():
+            return None
+        try:
+            s = pg.mixer.Sound(str(path))
+            s.set_volume(C.SFX_VOLUME)
+            return s
+        except pg.error:
+            return None
+
+    def _start_intro_music(self):
+        if not self._intro_path_ok or self._bgm_mode == "intro":
+            return
+        try:
+            pg.mixer.music.stop()
+            pg.mixer.music.load(str(C.INTRO_MUSIC))
+            pg.mixer.music.set_volume(C.MUSIC_VOLUME)
+            pg.mixer.music.play(-1)
+            self._bgm_mode = "intro"
+        except pg.error:
+            self._intro_path_ok = False
+
+    def _start_theme_music(self):
+        if self._bgm_mode == "theme":
+            return
+        pg.mixer.music.stop()
+        if not self._theme_path_ok:
+            self._bgm_mode = "none"
+            return
+        try:
+            pg.mixer.music.load(str(C.THEME_MUSIC))
+            pg.mixer.music.set_volume(C.MUSIC_VOLUME)
+            pg.mixer.music.play(-1)
+            self._bgm_mode = "theme"
+        except pg.error:
+            self._theme_path_ok = False
+            self._bgm_mode = "none"
+
+    def _stop_bgm(self):
+        if self._bgm_mode != "none":
+            pg.mixer.music.stop()
+            self._bgm_mode = "none"
 
     def _present(self):
         sw, sh = self.screen.get_size()

@@ -1,6 +1,20 @@
 # ASTEROIDE SINGLEPLAYER v1.0
 # This file stores the gameplay, rendering, and balancing constants.
 
+from pathlib import Path
+
+_ASSET_ROOT = Path(__file__).resolve().parent.parent
+ASSETS_DIR = _ASSET_ROOT / "assets"
+INTRO_MUSIC = ASSETS_DIR / "intro-song.WAV"
+THEME_MUSIC = ASSETS_DIR / "theme-song.wav"
+SFX_SHIP_BLASTER = ASSETS_DIR / "blaster-ship.WAV"
+SFX_UFO_BLASTER = ASSETS_DIR / "blaster-ufo.WAV"
+SFX_BIG_STONE_BREAK = ASSETS_DIR / "big-stone-break.wav"
+SFX_SMALL_STONE_BREAK = ASSETS_DIR / "small-stone-break.wav"
+SFX_DEFEAT = ASSETS_DIR / "defeat-sound.wav"
+MUSIC_VOLUME = 0.45
+SFX_VOLUME = 0.65
+
 WIDTH = 960
 HEIGHT = 720
 FPS = 60
