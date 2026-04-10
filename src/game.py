@@ -24,7 +24,8 @@ class Game:
         pg.init()
         if C.RANDOM_SEED is not None:
             random.seed(C.RANDOM_SEED)
-        self.screen = pg.display.set_mode((C.WIDTH, C.HEIGHT))
+        self.logical = pg.Surface((C.WIDTH, C.HEIGHT))
+        self.screen = pg.display.set_mode((0, 0), pg.FULLSCREEN)
         pg.display.set_caption("Asteroides")
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont("consolas", 20)
@@ -65,13 +66,13 @@ class Game:
                             self.scene = Scene("play")
 
             keys = pg.key.get_pressed()
-            self.screen.fill(C.BLACK)
+            self.logical.fill(C.BLACK)
 
             if self.scene.name == "menu":
                 self.draw_menu()
             elif self.scene.name == "play":
                 self.world.update(dt, keys)
-                self.world.draw(self.screen, self.font)
+                self.world.draw(self.logical, self.font)
                 # Verifica se o mundo sinalizou fim de jogo
                 if self.world.game_over:
                     self.final_score = self.world.score
@@ -81,7 +82,17 @@ class Game:
                 self.go_fade += dt
                 self.draw_game_over()
 
+            self._present()
             pg.display.flip()
+
+    def _present(self):
+        sw, sh = self.screen.get_size()
+        lw, lh = C.WIDTH, C.HEIGHT
+        scale = min(sw / lw, sh / lh)
+        nw, nh = max(1, int(lw * scale)), max(1, int(lh * scale))
+        scaled = pg.transform.smoothscale(self.logical, (nw, nh))
+        self.screen.fill(C.BLACK)
+        self.screen.blit(scaled, ((sw - nw) // 2, (sh - nh) // 2))
 
     def draw_game_over(self):
         # Exibe a tela de game over com fade-in, pontuação final e instruções.
@@ -89,29 +100,29 @@ class Game:
 
         overlay = pg.Surface((C.WIDTH, C.HEIGHT), pg.SRCALPHA)
         overlay.fill((0, 0, 0, alpha))
-        self.screen.blit(overlay, (0, 0))
+        self.logical.blit(overlay, (0, 0))
 
         if alpha < 60:
             return
 
-        text(self.screen, self.big, "GAME OVER",
+        text(self.logical, self.big, "GAME OVER",
              C.WIDTH // 2 - 130, C.HEIGHT // 2 - 100)
-        text(self.screen, self.font,
+        text(self.logical, self.font,
              f"Pontuacao final: {self.final_score:06d}",
              C.WIDTH // 2 - 110, C.HEIGHT // 2 - 20)
-        text(self.screen, self.font,
+        text(self.logical, self.font,
              "Enter / Espaco: jogar novamente",
              C.WIDTH // 2 - 150, C.HEIGHT // 2 + 40)
-        text(self.screen, self.font,
+        text(self.logical, self.font,
              "ESC: menu principal",
              C.WIDTH // 2 - 90, C.HEIGHT // 2 + 80)
 
     def draw_menu(self):
         # Draw the title screen and the basic control instructions.
-        text(self.screen, self.big, "ASTEROIDS",
+        text(self.logical, self.big, "ASTEROIDS",
              C.WIDTH // 2 - 150, 180)
-        text(self.screen, self.font,
+        text(self.logical, self.font,
              "Setas: virar/acelerar  Espaço: tiro  Shift: hiper",
              160, 300)
-        text(self.screen, self.font,
+        text(self.logical, self.font,
              "Pressione qualquer tecla...", 260, 360)
