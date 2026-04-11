@@ -76,6 +76,13 @@ class World:
             self.all_sprites.add(b)
             if self._sfx_ship: self._sfx_ship.play()
 
+    def try_dash(self):
+        self.ship.try_dash()
+
+    def hyperspace(self):
+        self.ship.hyperspace()
+        self.score = max(0, self.score - C.HYPERSPACE_COST)
+
     def update(self, dt: float, keys):
         self.ship.control(keys, dt)
         self.all_sprites.update(dt)
@@ -157,6 +164,7 @@ class World:
         self.ship.pos.xy = (C.WIDTH / 2, C.HEIGHT / 2)
         self.ship.vel.xy = (0, 0)
         self.ship.angle = -90
+        self.ship.dash_cool = 0.0
         self.ship.invuln = C.SAFE_SPAWN_TIME
         self.safe = C.SAFE_SPAWN_TIME
 
