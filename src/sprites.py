@@ -92,6 +92,7 @@ class Ship(pg.sprite.Sprite):
         # Atributos da barra de energia
         self.energy = 0
         self.max_energy = 100
+        self.dash_cool = 0.0
 
     def control(self, keys: pg.key.ScancodeWrapper, dt: float):
         if keys[pg.K_LEFT]:
@@ -101,6 +102,16 @@ class Ship(pg.sprite.Sprite):
         if keys[pg.K_UP]:
             self.vel += angle_to_vec(self.angle) * C.SHIP_THRUST * dt
         self.vel *= C.SHIP_FRICTION
+
+    def try_dash(self) -> bool:
+        if self.dash_cool > 0:
+            return False
+        if self.energy < C.SHIP_DASH_ENERGY_COST:
+            return False
+        self.energy -= C.SHIP_DASH_ENERGY_COST
+        self.vel += angle_to_vec(self.angle) * C.SHIP_DASH_IMPULSE
+        self.dash_cool = C.SHIP_DASH_COOLDOWN
+        return True
 
     def fire(self) -> Bullet | None:
         if self.cool > 0:
@@ -140,7 +151,9 @@ class Ship(pg.sprite.Sprite):
             self.cool -= dt
         if self.invuln > 0:
             self.invuln -= dt
-        
+        if self.dash_cool > 0:
+            self.dash_cool -= dt
+
         self.pos += self.vel * dt
         self.pos = wrap_pos(self.pos)
         self.rect.center = self.pos
