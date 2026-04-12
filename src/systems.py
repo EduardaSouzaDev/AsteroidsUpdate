@@ -85,7 +85,7 @@ class World:
         self.score = max(0, self.score - C.HYPERSPACE_COST)
 
     def update(self, dt: float, keys):
-        if keys[pg.K_LALT] and self.ship.energy > 0:
+        if keys[pg.K_s] and self.ship.energy > 0:
             self.slow_mult = C.SHIP_SLOW_MULT
             self.ship.energy = max(0, self.ship.energy - C.SHIP_SLOW_ENERGY_COST * dt)
         else:
