@@ -31,6 +31,7 @@ class World:
         self.wave_cool = C.WAVE_DELAY
         self.safe = C.SAFE_SPAWN_TIME
         self.ufo_timer = C.UFO_SPAWN_EVERY
+        self.slow_mult = C.SHIP_SLOW_MULT
         self.game_over = False
 
     def start_wave(self):
@@ -84,8 +85,15 @@ class World:
         self.score = max(0, self.score - C.HYPERSPACE_COST)
 
     def update(self, dt: float, keys):
+        if keys[pg.K_s] and self.ship.energy > 0:
+            self.slow_mult = C.SHIP_SLOW_MULT
+            self.ship.energy = max(0, self.ship.energy - C.SHIP_SLOW_ENERGY_COST * dt)
+        else:
+            self.slow_mult = 1
+        dt_scaled = self.slow_mult * dt
         self.ship.control(keys, dt)
-        self.all_sprites.update(dt)
+        self.all_sprites.update(dt_scaled)
+        self.ship.update(dt)
         if self.safe > 0:
             self.safe -= dt
             self.ship.invuln = 0.5

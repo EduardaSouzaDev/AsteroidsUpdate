@@ -199,10 +199,10 @@ class Game:
         text(self.logical, self.big, "ASTEROIDS",
              C.WIDTH // 2 - 150, 180)
         text(self.logical, self.font,
-             "Setas: virar/acelerar  Espaco: tiro  Shift: hiper  Ctrl dir: dash",
-             100, 300)
+             "Setas: virar/acelerar  Espaco: tiro  Shift: hiper  Ctrl dir: dash tecla S: Slow",
+             50, 300)
         text(self.logical, self.font,
-             "Energia: acertar asteroides (dash gasta energia)",
+             "Energia: acertar asteroides (dash e slow gasta energia)",
              140, 335)
         text(self.logical, self.font,
              "Pressione qualquer tecla...", 260, 375)
