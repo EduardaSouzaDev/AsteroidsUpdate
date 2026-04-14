@@ -39,7 +39,7 @@ cd src; python main.py
 | **Espaço**         | Tiro (também contínuo enquanto mantiveres premido)                              |
 | **S**              | Câmera / tempo mais lento enquanto há energia (gasta energia ao longo do tempo) |
 | **Shift esquerdo** | Hiperespaço (teleporte aleatório no ecrã, custo em pontos)                      |
-| **Ctrl direito**   | Dash (impulso à frente; custa energia e tem cooldown)                           |
+| **D**              | Dash (impulso à frente; custa energia e tem cooldown)                           |
 | **ESC**            | Sair (menu ou jogo) ou voltar ao menu (ecrã de game over)                       |
 | **Enter / Espaço** | No game over: jogar outra vez                                                   |
 | **Qualquer tecla** | No menu: iniciar partida                                                        |

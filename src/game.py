@@ -71,7 +71,7 @@ class Game:
                             self.world.try_fire()
                         if e.key == pg.K_LSHIFT:
                             self.world.hyperspace()
-                        if e.key == pg.K_RCTRL:
+                        if e.key == pg.K_d:
                             self.world.try_dash()
                     elif self.scene.name == "menu":
                         self.world = World(
@@ -199,7 +199,7 @@ class Game:
         text(self.logical, self.big, "ASTEROIDS",
              C.WIDTH // 2 - 150, 180)
         text(self.logical, self.font,
-             "Setas: virar/acelerar  Espaco: tiro  Shift: hiper  Ctrl dir: dash tecla S: Slow",
+             "Setas: virar/acelerar  Espaco: tiro  Shift: hiper  D: dash  S: Slow",
              50, 300)
         text(self.logical, self.font,
              "Energia: acertar asteroides (dash e slow gasta energia)",
